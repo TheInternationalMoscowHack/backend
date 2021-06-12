@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
 @dataclass
-class Qestions:
+class Questions:
 	main_questions = {
 	1: 'Выберите район откуда Вы поедете на мероприятие',
 	2: 'Когда планируете пойти на мероприятие',
@@ -34,3 +34,5 @@ class Qestions:
 		'GuidedTours': ['Пройтись по историческим местам Басманного района',
 			'Провести время на открытом воздухе'],
 		}
+
+questions = Questions()
