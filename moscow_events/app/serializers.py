@@ -41,5 +41,5 @@ class EventRetrieveSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Event
-        fields = ('title', 'description', 'image', 'spot_name', 'address', 'is_free', 'date_from', 'date_to', 'restriction',
-                  'district_name', 'spheres_names', 'themes_names')
+        fields = ('title', 'description', 'image', 'spot_name', 'address', 'is_free', 'date_from', 'date_to',
+                  'restriction', 'district_name', 'spheres_names', 'themes_names')
