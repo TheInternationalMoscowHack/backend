@@ -1,6 +1,6 @@
 from django.urls import path
 
-from moscow_events.app.views import EventListView, EventView
+from moscow_events.apps.events.views import EventListView, EventView
 
 urlpatterns = [
     path('events/', EventListView.as_view(), name='list_of_events'),

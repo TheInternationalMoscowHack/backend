@@ -1,24 +1,8 @@
 from rest_framework import serializers
 
-from moscow_events.app.models import Event, Sphere, Spot, Theme
-
-
-class SphereSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Sphere
-        fields = ('sphere_name', )
-
-
-class ThemeSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Theme
-        fields = ('theme_name', )
-
-
-class SpotSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Spot
-        fields = ('name', 'address', 'place_type')
+from moscow_events.apps.events.models import Event
+from moscow_events.apps.spheres.serializers import SphereSerializer
+from moscow_events.apps.themes.serializers import ThemeSerializer
 
 
 class EventListSerializer(serializers.ModelSerializer):

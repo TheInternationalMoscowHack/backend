@@ -40,11 +40,16 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     # 3d-party apps
+    'django_filters',
     'rest_framework',
     'drf_yasg',
 
     # Project apps
-    'moscow_events.app',
+    'moscow_events.apps.events',
+    'moscow_events.apps.spots',
+    'moscow_events.apps.spheres',
+    'moscow_events.apps.themes',
+    'moscow_events.apps.districts',
 ]
 
 MIDDLEWARE = [
