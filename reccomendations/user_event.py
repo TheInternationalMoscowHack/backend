@@ -82,10 +82,11 @@ class UserPerfectEvent:
 				ngramm = np.random.choice(list(self.spheres_words[theme].keys()))
 				self.answers_ngrams.append(ngramm)
 
-		elif answer in questions.categories_questions:
-			for theme in questions.categories_questions[answer]:
-				ngramm = np.random.choice(list(self.spheres_words[theme].keys()))
-				self.answers_ngrams.append(ngramm)
+		elif isinstance(answer, list):
+			for answ in answer:
+				for theme in questions.categories_questions[answ]:
+					ngramm = np.random.choice(list(self.spheres_words[theme].keys()))
+					self.answers_ngrams.append(ngramm)
 		else:
 			answer_n = self.last_questions['possible_answers'].index(answer)
 			ngrams = np.random.choice(list(self.spheres_words[self.last_themes[answer_n]].keys()),

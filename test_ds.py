@@ -33,10 +33,16 @@ def main():
 
 	user = UserPerfectEvent(json_data)
 
+	a = ['для одного', 'для двоих', 'компания друзей']
+	print(a)
+	user.set_answer(a)
+
 	json_question = user.get_questions()
 
 	print(json_question['possible_answers'][0])
 	user.set_answer(json_question['possible_answers'][0])
+
+	user.set_answer('skip')
 
 	reccomendations = user.get_events()
 
