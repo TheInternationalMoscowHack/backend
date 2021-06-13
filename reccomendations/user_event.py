@@ -5,6 +5,7 @@ from reccomendations.clean_text import clean_text
 
 import json
 import numpy as np
+import pandas as pd
 from sklearn.metrics.pairwise import cosine_similarity as coss
 
 
@@ -17,20 +18,21 @@ class UserPerfectEvent:
 		self.data = data
 		self.skip_flag = 'skip'
 
-		self.data.body_text = self.data.body_text.map(clean_text)
-		self.vectors = self.vectorizer.transform(self.data.body_text)
+		self.data['text'] = self.data['text'].map(clean_text)
+		self.vectors = self.vectorizer.transform(self.data['text'])
 		
-		self.data['sphere'] = self.spheres.map(
+		self.data['spheres'] = self.data['spheres'].map(
 			lambda x: ";".join([i['title'] for i in x]))
-		self.count_ngrams
+
 
 		self.spheres = set()
-		for i in self.data['sphere'].unique():
+		for i in self.data['spheres'].unique():
 			for j in i.split(';'):
 				self.spheres.add(j)
 
 		with open(config.SPHERES_WORDS, 'r') as fp:
 			self.spheres_words = json.load(fp)
+
 
 
 	def calc_top_themes(self, q, n):
@@ -61,7 +63,7 @@ class UserPerfectEvent:
 
 
 	def get_top_events(self, n):
-		res = self.data[data.dist > 0][['id', 'dist']].set_index('id')
+		res = self.data[self.data.dist > 0][['id', 'dist']].set_index('id')
 		if len(res) == 0:
 			return self.data.id.iloc[:n].tolist()
 		res = {k: v for k, v in sorted(res.to_dict()['dist'].items(),
@@ -91,7 +93,7 @@ class UserPerfectEvent:
 
 
 	def get_events(self, n_reccomedations=16):
-		return {'reccomendations': self.get_top_events(n)}
+		return {'reccomendations': self.get_top_events(n_reccomedations)}
 
 
 	def get_questions(self, max_questions=3):
