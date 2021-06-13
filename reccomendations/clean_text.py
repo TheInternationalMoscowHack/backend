@@ -1,10 +1,11 @@
 import re
 import pymorphy2
 
-from nltk.corpus import stopwords
+from reccomendations.config import config
 
 MORPH = pymorphy2.MorphAnalyzer()
-STOP_WORDS = set(stopwords.words(["russian", "english"])) #  множество русско английских стоп слов
+with open(config.STOP_WORDS, 'r') as f:
+  STOP_WORDS = f.read().split(';')      # nltk stopwords for ru and eng
 for i in ['nbsp', 'laquo', 'raquo', 'ndash', 'mdash', 'hellip', 'rdquo']:
     STOP_WORDS.add(i)
 

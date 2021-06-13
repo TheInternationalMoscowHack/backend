@@ -1,6 +1,7 @@
 from reccomendations.config import config
 from reccomendations.questions import questions
 from reccomendations.vectorizer import Vectorizer
+from reccomendations.clean_text import clean_text
 
 import json
 import numpy as np
@@ -15,7 +16,10 @@ class UserPerfectEvent:
 		self.answers_ngrams = []
 		self.data = data
 		self.skip_flag = 'skip'
-		self.vectors = self.vectorizer.transform(data)
+
+		self.data.body_text = self.data.body_text.map(clean_text)
+		self.vectors = self.vectorizer.transform(self.data.body_text)
+		
 		self.data['sphere'] = self..spheres.map(
 			lambda x: ";".join([i['title'] for i in x]))
 		self.count_ngrams
@@ -69,7 +73,10 @@ class UserPerfectEvent:
 
 	def set_answer(self, answer):
 		if answer == self.skip_flag:
-			pass
+			for theme in self.last_themes:
+				ngramm = np.random.choice(list(self.spheres_words[theme].keys()))
+				self.answers_ngrams.append(ngramm)
+
 		elif answer in questions.categories_questions:
 			for theme in questions.categories_questions[answer]:
 				ngramm = np.random.choice(list(self.spheres_words[theme].keys()))
