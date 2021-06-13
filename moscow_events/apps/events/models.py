@@ -16,20 +16,12 @@ class Event(models.Model):
     date_to = models.DateTimeField()
     restriction = models.PositiveIntegerField(default=0)
     click_count = models.PositiveIntegerField(default=0)
-    district = models.ForeignKey(District, on_delete=models.CASCADE)
+    district = models.ForeignKey(District, on_delete=models.CASCADE, default='', null=True)
     spot = models.ForeignKey(Spot, on_delete=models.CASCADE)
     spheres = models.ManyToManyField(Sphere)
     themes = models.ManyToManyField(Theme)
     created_at = models.DateTimeField(auto_now_add=True)
     modified_at = models.DateTimeField(auto_now=True)
-
-    @property
-    def get_spheres(self):
-        global spheres
-        names_spheres = []
-        for sphere in spheres:
-            names_spheres.append(sphere.name)
-        return names_spheres
 
     def __str__(self):
         return f'{self.title}'
