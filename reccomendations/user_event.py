@@ -3,6 +3,7 @@ from reccomendations.questions import questions
 from reccomendations.vectorizer import Vectorizer
 from reccomendations.clean_text import clean_text
 
+import ast
 import json
 import numpy as np
 import pandas as pd
@@ -15,7 +16,9 @@ class UserPerfectEvent:
 		self.vectorizer.load_vectorizer(path=config.MODEL_VECTORIZER)
 		self.question_counter = 0
 		self.answers_ngrams = []
-		self.data = pd.DataFrame(data)
+
+		dt = ast.literal_eval(str(data))
+		self.data = pd.DataFrame(data=(dt))
 		self.skip_flag = 'skip'
 		self.max_questions = 3
 		self.data['simil'] = 0
