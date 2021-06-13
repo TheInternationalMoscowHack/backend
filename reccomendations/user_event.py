@@ -87,7 +87,7 @@ class UserPerfectEvent:
 				ngramm = np.random.choice(list(self.spheres_words[theme].keys()))
 				self.answers_ngrams.append(ngramm)
 		else:
-			answer_n = list(self.last_questions.values())[0].index(answer)
+			answer_n = self.last_questions['possible_answers'].index(answer)
 			ngrams = np.random.choice(list(self.spheres_words[self.last_themes[answer_n]].keys()),
 				self.count_ngrams)
 			self.answers_ngrams.extend(ngrams)
@@ -117,6 +117,7 @@ class UserPerfectEvent:
 				np.random.choice(questions.sphere_questions[i])) 
 		
 		self.last_themes = themes
-		self.last_questions = {question: possible_answers} # ToDo: Проверка на то, что вопросы не повторятся
+		self.last_questions = {'question': question,
+			"possible_answers": possible_answers} # ToDo: Проверка на то, что вопросы не повторятся
 		self.question_counter += 1
 		return self.last_questions

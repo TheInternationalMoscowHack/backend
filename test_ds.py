@@ -35,7 +35,8 @@ def main():
 
 	json_question = user.get_questions()
 
-	user.set_answer(list(json_question.values())[0][0])
+	print(json_question['possible_answers'][0])
+	user.set_answer(json_question['possible_answers'][0])
 
 	reccomendations = user.get_events()
 
@@ -43,3 +44,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+
