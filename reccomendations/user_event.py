@@ -15,14 +15,17 @@ class UserPerfectEvent:
 		self.vectorizer.load_vectorizer(path=config.MODEL_VECTORIZER)
 		self.question_counter = 0
 		self.answers_ngrams = []
-		self.data = data
+		self.data = pd.DataFrame(data)
 		self.skip_flag = 'skip'
+		self.max_questions = 3
+		self.data['simil'] = 0
+		self.count_ngrams = 3
 
-		self.data['text'] = self.data['text'].map(clean_text)
-		self.vectors = self.vectorizer.transform(self.data['text'])
+		self.data['description'] = self.data['description'].map(clean_text)
+		self.vectors = self.vectorizer.transform(self.data['description'])
 		
 		self.data['spheres'] = self.data['spheres'].map(
-			lambda x: ";".join([i['title'] for i in x]))
+			lambda x: ";".join([i for i in x['sphere_name'].split(", ")]))
 
 
 		self.spheres = set()
@@ -36,10 +39,10 @@ class UserPerfectEvent:
 
 
 	def calc_top_themes(self, q, n):
-		less = np.quantile(coss(X, tfidfs)[0], [(q - 1) * 0.25])[0]
-		great = np.quantile(coss(X, tfidfs)[0], [q * 0.25])[0]
+		less = np.quantile(self.data['simil'], [(q - 1) * 0.25])[0]
+		great = np.quantile(self.data['simil'] , [q * 0.25])[0]
 
-		v = self.data[(great >= self.data['dist']) & (self.data['dist'] >= less)]['type'].value_counts().to_dict()
+		v = self.data[(great >= self.data['simil']) & (self.data['simil'] >= less)]['spheres'].value_counts().to_dict()
 		keys = list(v.keys())
 		for i in keys:
 			if len(i.split(", ")) > 1:
@@ -63,10 +66,10 @@ class UserPerfectEvent:
 
 
 	def get_top_events(self, n):
-		res = self.data[self.data.dist > 0][['id', 'dist']].set_index('id')
+		res = self.data[self.data.simil > 0][['id', 'simil']].set_index('id')
 		if len(res) == 0:
 			return self.data.id.iloc[:n].tolist()
-		res = {k: v for k, v in sorted(res.to_dict()['dist'].items(),
+		res = {k: v for k, v in sorted(res.to_dict()['simil'].items(),
 			key=lambda item: item[1], reverse=True)}
 		if len(res) < n:
 			return list(res.keys()) + self.data.id.iloc[:n - len(res)].tolist()
@@ -84,26 +87,26 @@ class UserPerfectEvent:
 				ngramm = np.random.choice(list(self.spheres_words[theme].keys()))
 				self.answers_ngrams.append(ngramm)
 		else:
-			answer_n = list(self.last_questions.values())[0].index[answer]
+			answer_n = list(self.last_questions.values())[0].index(answer)
 			ngrams = np.random.choice(list(self.spheres_words[self.last_themes[answer_n]].keys()),
 				self.count_ngrams)
 			self.answers_ngrams.extend(ngrams)
 		X = self.vectorizer.transform([" ".join(self.answers_ngrams)]) 
-		self.data['dist'] = coss(X, tfidfs)[0]
+		self.data['simil'] = coss(X, self.vectors)[0]
 
 
 	def get_events(self, n_reccomedations=16):
 		return {'reccomendations': self.get_top_events(n_reccomedations)}
 
 
-	def get_questions(self, max_questions=3):
+	def get_questions(self):
 		"""
 		Send user questions for user.
 		If get answer - changes perfect vector and
 		choose new answer
 		"""
 
-		if self.question_counter == max_questions:
+		if self.question_counter >= self.max_questions:
 			return self.get_events()
 
 		themes = self.choose_themes()
