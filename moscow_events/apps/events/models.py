@@ -23,5 +23,13 @@ class Event(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     modified_at = models.DateTimeField(auto_now=True)
 
+    @property
+    def get_spheres(self):
+        global spheres
+        names_spheres = []
+        for sphere in spheres:
+            names_spheres.append(sphere.name)
+        return names_spheres
+
     def __str__(self):
         return f'{self.title}'
