@@ -4,7 +4,6 @@ from moscow_events.apps.districts.models import District
 from moscow_events.apps.spheres.models import Sphere
 from moscow_events.apps.spots.models import Spot
 from moscow_events.apps.themes.models import Theme
-from moscow_events.settings import MEDIA_EVENT_IMAGE_DIR
 
 
 class Event(models.Model):
