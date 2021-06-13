@@ -25,12 +25,12 @@ class UserPerfectEvent:
 		self.vectors = self.vectorizer.transform(self.data['description'])
 		
 		self.data['spheres'] = self.data['spheres'].map(
-			lambda x: ";".join([i for i in x['sphere_name'].split(", ")]))
+			lambda x: ", ".join([i for i in x]))
 
 
 		self.spheres = set()
 		for i in self.data['spheres'].unique():
-			for j in i.split(';'):
+			for j in i.split(', '):
 				self.spheres.add(j)
 
 		with open(config.SPHERES_WORDS, 'r') as fp:
@@ -55,14 +55,14 @@ class UserPerfectEvent:
 		return sorted(v.items(), key=lambda item: item[1], reverse=True)[:n]
 
 
-	def choose_themes(self):
+	def choose_themes(self, n):
 		themes_1 = self.calc_top_themes(q=1, n=2)
 		themes_2 = self.calc_top_themes(q=4, n=4)
 		themes = [i for i, _ in themes_1]
 		for i, _ in themes_2:
 			if i not in themes:
 				themes.append(i)
-		return themes[:4]
+		return themes[:n]
 
 
 	def get_top_events(self, n):
@@ -82,12 +82,13 @@ class UserPerfectEvent:
 				ngramm = np.random.choice(list(self.spheres_words[theme].keys()))
 				self.answers_ngrams.append(ngramm)
 
-		elif answer in questions.categories_questions:
-			for theme in questions.categories_questions[answer]:
-				ngramm = np.random.choice(list(self.spheres_words[theme].keys()))
-				self.answers_ngrams.append(ngramm)
+		elif isinstance(answer, list):
+			for answ in answer:
+				for theme in questions.categories_questions[answ]:
+					ngramm = np.random.choice(list(self.spheres_words[theme].keys()))
+					self.answers_ngrams.append(ngramm)
 		else:
-			answer_n = list(self.last_questions.values())[0].index(answer)
+			answer_n = self.last_questions['possible_answers'].index(answer)
 			ngrams = np.random.choice(list(self.spheres_words[self.last_themes[answer_n]].keys()),
 				self.count_ngrams)
 			self.answers_ngrams.extend(ngrams)
@@ -99,7 +100,7 @@ class UserPerfectEvent:
 		return {'reccomendations': self.get_top_events(n_reccomedations)}
 
 
-	def get_questions(self):
+	def get_questions(self, n_quetions=3):
 		"""
 		Send user questions for user.
 		If get answer - changes perfect vector and
@@ -109,7 +110,7 @@ class UserPerfectEvent:
 		if self.question_counter >= self.max_questions:
 			return self.get_events()
 
-		themes = self.choose_themes()
+		themes = self.choose_themes(n=n_quetions)
 		question = questions.sphere_ask
 		possible_answers = []
 		for i in themes:
@@ -117,6 +118,7 @@ class UserPerfectEvent:
 				np.random.choice(questions.sphere_questions[i])) 
 		
 		self.last_themes = themes
-		self.last_questions = {question: possible_answers} # ToDo: Проверка на то, что вопросы не повторятся
+		self.last_questions = {'question': question,
+			"possible_answers": possible_answers} # ToDo: Проверка на то, что вопросы не повторятся
 		self.question_counter += 1
 		return self.last_questions

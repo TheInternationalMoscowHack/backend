@@ -1,41 +1,33 @@
 from reccomendations.user_event import UserPerfectEvent
 
 def main():
-	json_data = {
-			"id": 123,
+	json_data = [{
+			"id": 132,
             "title": "Концерт в парке",
             "description": "Интересный концерт в парке",
-            "image": "http://events-hack.herokuapp.com/media/event_images/2021-06-13_12-11-12.png",
-            "spot_name": "ЦПКиО",
-            "address": "ул. Пушкина",
-            "is_free": False,
-            "date_from": "2021-06-01T18:00:00Z",
-            "date_to": "2021-06-30T18:00:00Z",
-            "restriction": 6,
-            "district_name": "Центральный",
-            "spheres": [
-                {
-                    "id": 1,
-                    "sphere_name": "Спектакли",
-                    "created_at": "2021-06-13T11:08:56.859725Z",
-                    "modified_at": "2021-06-13T11:08:56.859725Z"
-                }
-            ],
-            "themes": [
-                {
-                    "id": 1,
-                    "theme_name": "События в парках",
-                    "created_at": "2021-06-13T11:10:30.234704Z",
-                    "modified_at": "2021-06-13T11:10:30.235739Z"
-                }
-            ]
-	}
+            "spheres": ['Спектакли', 'Чтения'],
+	},
+	{
+			"id": 124,
+            "title": "Концерт в парке",
+            "description": "Интересный концерт в парке",
+            "spheres": ['Спектакли', 'Концерты'],
+	}]
 
 	user = UserPerfectEvent(json_data)
 
+	a = ['для одного', 'для двоих', 'компания друзей']
+	print(a)
+	user.set_answer(a)
+
 	json_question = user.get_questions()
 
-	user.set_answer(list(json_question.values())[0][0])
+	print(json_question['question'])
+	for i in json_question['possible_answers']:
+		print(i)
+	user.set_answer(json_question['possible_answers'][0])
+
+	user.set_answer('skip')
 
 	reccomendations = user.get_events()
 
@@ -43,3 +35,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+
