@@ -1,8 +1,8 @@
 from reccomendations.config import config
 from reccomendations.questions import questions
-
 from reccomendations.vectorizer import Vectorizer
 
+import json
 import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity as coss
 
@@ -12,17 +12,21 @@ class UserPerfectEvent:
 		self.vectorizer = Vectorizer()
 		self.vectorizer.load_vectorizer(path=config.MODEL_VECTORIZER)
 		self.question_counter = 0
-		self.answers = []
+		self.answers_ngrams = []
 		self.data = data
+		self.skip_flag = 'skip'
 		self.vectors = self.vectorizer.transform(data)
 		self.data['sphere'] = self..spheres.map(
 			lambda x: ";".join([i['title'] for i in x]))
+		self.count_ngrams
 
 		self.spheres = set()
 		for i in self.data['sphere'].unique():
 		    for j in i.split(';'):
 		        self.spheres.add(j)
 
+		with open(config.SPHERES_WORDS, 'r') as fp:
+        	self.spheres_words = json.load(fp)
 
 
 	def calc_top_themes(self, q, n):
@@ -51,6 +55,7 @@ class UserPerfectEvent:
 				themes.append(i)
 		return themes[:4]
 
+
 	def get_top_events(self, n):
 		res = self.data[data.dist > 0][['id', 'dist']].set_index('id')
 		if len(res) == 0:
@@ -62,25 +67,35 @@ class UserPerfectEvent:
 		return list(res.keys())[:n]
 
 
-	def get_questions(self, answer=None, max_questions=3,
-		n_reccomedations=16):
+	def set_answer(self, answer):
+		if answer == self.skip_flag:
+			pass
+		elif answer in questions.categories_questions:
+			for theme in questions.categories_questions[answer]:
+				ngramm = np.random.choice(list(self.spheres_words[theme].keys()))
+				self.answers_ngrams.append(ngramm)
+		else:
+			answer_n = list(self.last_questions.values())[0].index[answer]
+			ngrams = np.random.choice(list(self.spheres_words[self.last_themes[answer_n]].keys()),
+				self.count_ngrams)
+			self.answers_ngrams.extend(ngrams)
+		X = self.vectorizer.transform([" ".join(self.answers_ngrams)]) 
+		self.data['dist'] = coss(X, tfidfs)[0]
+
+
+	def get_events(self, n_reccomedations=16):
+		return {'reccomendations': self.get_top_events(n)}
+
+
+	def get_questions(self, max_questions=3):
 		"""
 		Send user questions for user.
 		If get answer - changes perfect vector and
 		choose new answer
 		"""
-		if self.question_counter == 0:
-			pass # выбор из 4 частотных тем
-
-		if answer in questions.categories_questions:
-			pass # ToDo: добавить слова из каждой категории
-		else:
-			self.answers.append(answer) # ToDo: заменить answer на набор топ слов из темы
-		X = self.vectorizer.transform([" ".join(self.answers)]) 
-		self.data['dist'] = coss(X, tfidfs)[0]
 
 		if self.question_counter == max_questions:
-			return {'reccomendations': self.get_top_events(n)}
+			return self.get_events()
 
 		themes = self.choose_themes()
 		question = questions.sphere_ask
@@ -88,4 +103,8 @@ class UserPerfectEvent:
 		for i in themes:
 			possible_answers.append(
 				np.random.choice(questions.sphere_questions[i])) 
-		return {question: possible_answers}
+		
+		self.last_themes = themes
+		self.last_questions = {question: possible_answers} # ToDo: Проверка на то, что вопросы не повторятся
+		self.question_counter += 1
+		return self.last_questions
