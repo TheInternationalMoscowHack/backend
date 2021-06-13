@@ -10,7 +10,7 @@ from moscow_events.settings import MEDIA_EVENT_IMAGE_DIR
 class Event(models.Model):
     title = models.CharField(max_length=40)
     description = models.TextField()
-    image = models.ImageField(upload_to=MEDIA_EVENT_IMAGE_DIR)
+    image = models.CharField(max_length=500)
     is_free = models.BooleanField()
     date_from = models.DateTimeField()
     date_to = models.DateTimeField()

@@ -17,7 +17,7 @@ class Command(BaseCommand):
                     new_event = Event.objects.create(
                         title=event['title'],
                         description=event['text'],
-                        image='https://www.mos.ru' + event['image']['original']['src'],
+                        image='https://www.mos.ru/' + event['image']['original']['src'],
                         is_free=event['free'],
                         date_from=event['date_from'],
                         date_to=event['date_to'],
@@ -28,7 +28,7 @@ class Command(BaseCommand):
                     new_event = Event.objects.create(
                         title=event['title'],
                         description=event['text'],
-                        image='https://www.mos.ru' + event['image']['original']['src'],
+                        image='https://www.mos.ru/' + event['image']['original']['src'],
                         is_free=event['free'],
                         date_from=event['date_from'],
                         date_to=event['date_to'],
