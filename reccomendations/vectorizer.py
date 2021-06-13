@@ -8,3 +8,6 @@ class Vectorizer:
 		with open(path, 'rb') as f:
 			self.vectorizer = pickle.load(f)
 
+	def transform(self, X):
+		return self.vectorizer.transform(X)
+

@@ -5,7 +5,7 @@ from reccomendations.config import config
 
 MORPH = pymorphy2.MorphAnalyzer()
 with open(config.STOP_WORDS, 'r') as f:
-	STOP_WORDS = f.read().split(';')      # nltk stopwords for ru and eng
+	STOP_WORDS = set(f.read().split(';'))      # nltk stopwords for ru and eng
 for i in ['nbsp', 'laquo', 'raquo', 'ndash', 'mdash', 'hellip', 'rdquo']:
 		STOP_WORDS.add(i)
 
@@ -29,4 +29,4 @@ def clean_stopwords(text):
 def clean_text(text):
 	text = clean_html(text)
 	text = normalize_text_with_morph(text, MORPH)
-	return clean_text(text)
+	return clean_stopwords(text)
