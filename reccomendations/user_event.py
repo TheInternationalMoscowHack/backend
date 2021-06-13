@@ -24,8 +24,8 @@ class UserPerfectEvent:
 		self.data['simil'] = 0
 		self.count_ngrams = 3
 
-		self.data['description'] = self.data['description'].map(clean_text)
-		self.vectors = self.vectorizer.transform(self.data['description'])
+		self.data['text'] = self.data['text'].map(clean_text)
+		self.vectors = self.vectorizer.transform(self.data['text'])
 		
 		self.data['spheres'] = self.data['spheres'].map(
 			lambda x: ", ".join([i for i in x]))
