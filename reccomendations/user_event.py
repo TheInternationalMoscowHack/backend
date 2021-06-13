@@ -20,17 +20,17 @@ class UserPerfectEvent:
 		self.data.body_text = self.data.body_text.map(clean_text)
 		self.vectors = self.vectorizer.transform(self.data.body_text)
 		
-		self.data['sphere'] = self..spheres.map(
+		self.data['sphere'] = self.spheres.map(
 			lambda x: ";".join([i['title'] for i in x]))
 		self.count_ngrams
 
 		self.spheres = set()
 		for i in self.data['sphere'].unique():
-		    for j in i.split(';'):
-		        self.spheres.add(j)
+			for j in i.split(';'):
+				self.spheres.add(j)
 
 		with open(config.SPHERES_WORDS, 'r') as fp:
-        	self.spheres_words = json.load(fp)
+			self.spheres_words = json.load(fp)
 
 
 	def calc_top_themes(self, q, n):
@@ -38,16 +38,16 @@ class UserPerfectEvent:
 		great = np.quantile(coss(X, tfidfs)[0], [q * 0.25])[0]
 
 		v = self.data[(great >= self.data['dist']) & (self.data['dist'] >= less)]['type'].value_counts().to_dict()
-  		keys = list(v.keys())
-    	for i in keys:
-        	if len(i.split(", ")) > 1:
-            	for j in i.split(", "):
-                	if j in v.keys():
-                    	v[j] += v[i]
-                	else:
-                    	v[j] = v[i]
-	            del v[i]
-    	return sorted(v.items(), key=lambda item: item[1], reverse=True)[:n]
+		keys = list(v.keys())
+		for i in keys:
+			if len(i.split(", ")) > 1:
+				for j in i.split(", "):
+					if j in v.keys():
+						v[j] += v[i]
+					else:
+						v[j] = v[i]
+				del v[i]
+		return sorted(v.items(), key=lambda item: item[1], reverse=True)[:n]
 
 
 	def choose_themes(self):
