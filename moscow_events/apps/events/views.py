@@ -50,6 +50,7 @@ class FirstRecommendationView(APIView):
         district = request.POST['district']
         date = request.POST['date']
         categories = request.POST['categories']
+        categories = categories[2:-2].split("', '")
         date_format = datetime.strptime(date, '%Y-%m-%d')
         events = Event.objects.filter(district__district_name=district).filter(date_from__lte=date_format).filter(
             date_to__gte=date_format)
