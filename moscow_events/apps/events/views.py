@@ -4,6 +4,7 @@ import json
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import status
 from rest_framework.generics import ListAPIView
+from rest_framework.parsers import JSONParser
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
@@ -39,6 +40,7 @@ class EventView(ListAPIView):
 
 
 class FirstRecommendationView(APIView):
+    parser_classes = [JSONParser]
 
     def post(self, request):
         """
@@ -47,10 +49,11 @@ class FirstRecommendationView(APIView):
         при повторном обращении к вопросам значение по UID обнволяется
         """
         uid = request.GET.get('uid')
-        district = request.POST['district']
-        date = request.POST['date']
-        categories = request.POST['categories']
-        categories = categories[2:-2].split("', '")
+        print(request.data)
+        district = request.data['district']
+        date = request.data['date']
+        categories = request.data['categories']
+        # categories = categories[2:-2].split("', '")
         date_format = datetime.strptime(date, '%Y-%m-%d')
         events = Event.objects.filter(district__district_name=district).filter(date_from__lte=date_format).filter(
             date_to__gte=date_format)
